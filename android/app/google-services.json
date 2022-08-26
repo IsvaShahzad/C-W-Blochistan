@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "61282354172",
+    "project_id": "chat-app-59b07",
+    "storage_bucket": "chat-app-59b07.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:61282354172:android:731f836d6276e7410ca879",
+        "android_client_info": {
+          "package_name": "com.chat_firebase.balochistan_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "61282354172-hoev0upaiqpm1en4a0dnofh1hf7v12mp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnI6nWWeGV4S_4v1fEBtY88mWfi6MXMsk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "61282354172-hoev0upaiqpm1en4a0dnofh1hf7v12mp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
