@@ -1,3 +1,4 @@
+
 import 'package:balochistan_app/reset_password.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,11 @@ import 'dart:io';
 import 'dart:async';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:ui';
+
+
+
 
 class InspectionScreen extends StatefulWidget {
 
@@ -26,10 +32,13 @@ class InspectionScreen extends StatefulWidget {
 }
 
 class _InspectionScreenState extends State<InspectionScreen> {
+  final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
 
 
+
   User? loggedInUser;
+  late String informationText;
 
   // void initState() {
   //   super.initState();
@@ -42,10 +51,18 @@ class _InspectionScreenState extends State<InspectionScreen> {
       final firebaseUser = await _auth.currentUser;
       if (firebaseUser != null) {
         loggedInUser = firebaseUser;
-        print(loggedInUser!.email);
+        // print(loggedInUser!.email);
       }
     } catch (e) {
       print(e);
+    }
+  }
+
+  void GetInformation() async{
+  final information = await  _firestore.collection('information').get();
+  for(var info in information.docs)
+    {
+      print(information.docs);
     }
   }
 
@@ -101,8 +118,14 @@ class _InspectionScreenState extends State<InspectionScreen> {
               IconButton(
                   icon: Icon(Icons.close),
                   onPressed:() {
-                    _auth.signOut();
-                    Navigator.pop(context);
+                    GetInformation();
+                    // _auth.signOut();
+                    // Navigator.pushReplacement(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder:
+                    //             (BuildContext context) =>
+                    //             LoginScreen()));
                   }),
           ],
           iconTheme: IconThemeData(color: Colors.black),
@@ -390,6 +413,10 @@ class _InspectionScreenState extends State<InspectionScreen> {
                               Padding(
                                 padding: const EdgeInsets.only(top: 0),
                                 child: TextFormField(
+                                  onChanged: (value) {
+                                    informationText=value;
+                                  },
+
                                   controller: passwordController,
                                   decoration: InputDecoration(
                                     filled: true,
@@ -559,6 +586,13 @@ class _InspectionScreenState extends State<InspectionScreen> {
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16)),
                                     onPressed: () {
+
+                                      _firestore.collection('information').add({
+                                        'text':informationText,
+                                        'sender':loggedInUser?.email,
+
+                                          });
+
                                       if (loginFormKey.currentState!.validate())
                                         Navigator.pushReplacement(
                                             context,
