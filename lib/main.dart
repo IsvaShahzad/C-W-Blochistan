@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
 
 
 
-          theme: ThemeData(
+            theme: ThemeData(
             primarySwatch: Colors.teal,
             inputDecorationTheme: const InputDecorationTheme(
               enabledBorder: OutlineInputBorder(

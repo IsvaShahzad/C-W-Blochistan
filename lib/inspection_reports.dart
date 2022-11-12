@@ -1,4 +1,3 @@
-
 import 'package:balochistan_app/reset_password.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
@@ -21,12 +20,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:ui';
 
-
-
-
 class InspectionScreen extends StatefulWidget {
-
-  static const String id= 'inspection_reports';
+  static const String id = 'inspection_reports';
   @override
   State<InspectionScreen> createState() => _InspectionScreenState();
 }
@@ -35,8 +30,6 @@ class _InspectionScreenState extends State<InspectionScreen> {
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
 
-
-
   User? loggedInUser;
   late String informationText;
 
@@ -44,7 +37,6 @@ class _InspectionScreenState extends State<InspectionScreen> {
   //   super.initState();
   //   getCurrentUser();
   // }
-
 
   void getCurrentUser() async {
     try {
@@ -58,11 +50,20 @@ class _InspectionScreenState extends State<InspectionScreen> {
     }
   }
 
-  void GetInformation() async{
-  final information = await  _firestore.collection('information').get();
-  for(var info in information.docs)
-    {
-      print(information.docs);
+  // void GetInformation() async{
+  // final information = await  _firestore.collection('information').get();
+  // for(var info in information.docs)
+  //   {
+  //     print(info.data);
+  //   }
+  // }
+
+  void messagesStream() async {
+    await for (var snapshot
+        in _firestore.collection('information').snapshots()) {
+      for (var info in snapshot.docs) {
+        print(info.data());
+      }
     }
   }
 
@@ -96,7 +97,6 @@ class _InspectionScreenState extends State<InspectionScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -110,23 +110,23 @@ class _InspectionScreenState extends State<InspectionScreen> {
                 color: Color(0xFF289488),
                 fontWeight: FontWeight.bold,
               )),
-          actions:<Widget> [
+          actions: <Widget>[
             // IconButton(
             //   icon: Image.asset('assets/images/balochistan.png'),
             //   onPressed: () => null,
             // ),
-              IconButton(
-                  icon: Icon(Icons.close),
-                  onPressed:() {
-                    GetInformation();
-                    // _auth.signOut();
-                    // Navigator.pushReplacement(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder:
-                    //             (BuildContext context) =>
-                    //             LoginScreen()));
-                  }),
+            IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  messagesStream();
+                  // _auth.signOut();
+                  // Navigator.pushReplacement(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //         builder:
+                  //             (BuildContext context) =>
+                  //             LoginScreen()));
+                }),
           ],
           iconTheme: IconThemeData(color: Colors.black),
         ),
@@ -414,9 +414,8 @@ class _InspectionScreenState extends State<InspectionScreen> {
                                 padding: const EdgeInsets.only(top: 0),
                                 child: TextFormField(
                                   onChanged: (value) {
-                                    informationText=value;
+                                    informationText = value;
                                   },
-
                                   controller: passwordController,
                                   decoration: InputDecoration(
                                     filled: true,
@@ -464,12 +463,14 @@ class _InspectionScreenState extends State<InspectionScreen> {
                                                 children: <Widget>[
                                                   SimpleDialogOption(
                                                     onPressed: () async {
-                                                      final ImagePicker _picker =
+                                                      final ImagePicker
+                                                          _picker =
                                                           ImagePicker();
-                                                      final img =
-                                                          await _picker.pickImage(
-                                                              source: ImageSource
-                                                                  .gallery);
+                                                      final img = await _picker
+                                                          .pickImage(
+                                                              source:
+                                                                  ImageSource
+                                                                      .gallery);
                                                       setState(() {
                                                         image = img;
                                                       });
@@ -484,12 +485,14 @@ class _InspectionScreenState extends State<InspectionScreen> {
                                                   ),
                                                   SimpleDialogOption(
                                                     onPressed: () async {
-                                                      final ImagePicker _picker =
+                                                      final ImagePicker
+                                                          _picker =
                                                           ImagePicker();
-                                                      final img =
-                                                          await _picker.pickImage(
-                                                              source: ImageSource
-                                                                  .camera);
+                                                      final img = await _picker
+                                                          .pickImage(
+                                                              source:
+                                                                  ImageSource
+                                                                      .camera);
                                                       setState(() {
                                                         image = img;
                                                       });
@@ -498,15 +501,56 @@ class _InspectionScreenState extends State<InspectionScreen> {
                                                         Expanded(
                                                             child: Column(
                                                                 children: [
-                                                                  Expanded(child: Image.file(File(image!.path))),
+                                                              StreamBuilder<
+                                                                  QuerySnapshot>(
+                                                                stream: _firestore
+                                                                    .collection(
+                                                                        'information')
+                                                                    .snapshots(),
+                                                                builder: (context,
+                                                                    AsyncSnapshot
+                                                                        snapshot) {
+                                                                  if (snapshot
+                                                                      .hasData) {
+                                                                    final information =
+                                                                        snapshot
+                                                                            .data!
+                                                                            .docs;
 
+                                                                    List<Text>
+                                                                        messageWidgets =
+                                                                        [];
+                                                                    for (var info
+                                                                        in information) {
+                                                                      final messageText =
+                                                                          info.data[
+                                                                              'text'];
+                                                                      final messageSender =
+                                                                          info.data[
+                                                                              'sender'];
+                                                                      final messageWidget =
+                                                                          Text(
+                                                                              '$messageText from $messageSender');
+                                                                      messageWidgets
+                                                                          .add(
+                                                                              messageWidget);
+                                                                    }
+                                                                    return Column(
+                                                                      children:
+                                                                          messageWidgets,
+                                                                    );
 
-                                                                ]));
+                                                                  }
+                                                                  return Container();
+                                                                },
+                                                              ),
+                                                              Expanded(
+                                                                  child: Image.file(
+                                                                      File(image!
+                                                                          .path))),
+                                                            ]));
 
                                                       Navigator.pop(context);
-
-
-
                                                     },
                                                     child: const Text(
                                                         'Take A New Picture'),
@@ -532,10 +576,7 @@ class _InspectionScreenState extends State<InspectionScreen> {
 //
 //
 //     )
-
                                                 ]);
-
-
                                           });
                                     },
                                     child: Container(
@@ -543,7 +584,8 @@ class _InspectionScreenState extends State<InspectionScreen> {
                                         padding: EdgeInsets.symmetric(
                                             vertical: 0.0, horizontal: 10),
                                         child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
                                           children: [
                                             Icon(
                                               Icons.image,
@@ -586,12 +628,10 @@ class _InspectionScreenState extends State<InspectionScreen> {
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16)),
                                     onPressed: () {
-
                                       _firestore.collection('information').add({
-                                        'text':informationText,
-                                        'sender':loggedInUser?.email,
-
-                                          });
+                                        'text': informationText,
+                                        'sender': loggedInUser?.email,
+                                      });
 
                                       if (loginFormKey.currentState!.validate())
                                         Navigator.pushReplacement(
